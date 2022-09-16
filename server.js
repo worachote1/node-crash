@@ -19,7 +19,7 @@ const server = http.createServer((req,res)=>{
     //Routing
     let path = './views/'
     switch(req.url){
-      case '/':
+      case '/': 
         path+='index.html'
         res.statusCode = 200;
         break;
