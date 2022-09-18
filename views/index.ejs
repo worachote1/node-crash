@@ -12,12 +12,15 @@
 
             <% if(AllBlogs.length> 0){ %>
                 <% AllBlogs.forEach(blog=> {%>
-                    <h3 class="title">
-                        <%= blog.title %>
-                    </h3>
-                    <p class="snippet">
-                        <%= blog.snippet %>
-                    </p>
+                    <p></p>
+                    <a class="single" href="/blogs/<%= blog._id %>">
+                        <h3 class="title">
+                            <%= blog.title %>
+                        </h3>
+                        <p class="snippet">
+                            <%= blog.snippet %>
+                        </p>
+                    </a>
                     <% })%>
             <% }else {%>
                 <h3>There are no blog to display...</h3>
