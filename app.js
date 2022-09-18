@@ -15,73 +15,81 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     }
     )
     .catch((err) => { console.log(err) })
-//register view engine
-app.set('view engine', 'ejs')
 
-//middleware and static files
-app.use(express.static('public'))
-app.use(morgan('dev'))
-app.use(express.urlencoded({ extended: true })) //parse url post rquest from form submit
+// register view engine
+app.set('view engine', 'ejs');
 
-//routes
+// middleware & static files
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+// app.use((req, res, next) => {
+//   res.locals.path = req.path;
+//   next();
+// });
+
+// routes
 app.get('/', (req, res) => {
-    res.redirect('/blog')
+  res.redirect('/blogs');
 });
+
 app.get('/about', (req, res) => {
-    //res.send('<p>about page</p>');
-    res.render('about', {
-        title: "44About"
-    })
+  res.render('about', { title: 'About' });
 });
 
-//blog routes
-app.get("/blog", (req, res) => {
-    //find all document inside Blog collection
-    //and sort the Newest blog in the first
-    Blog.find().sort({ createdAt: -1 })
-        .then((result) => {
-            res.render('index', { title: "All Blog 44prn", AllBlogs: result })
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-})
-
+// blog routes
 app.get('/blogs/create', (req, res) => {
-    res.render('create', {
-        title: "44Create"
+  res.render('create', { title: 'Create a new blog' });
+});
+
+app.get('/blogs', (req, res) => {
+  Blog.find().sort({ createdAt: -1 })
+    .then(result => {
+      res.render('index', { blogs: result, title: 'All blogs' });
     })
-})
+    .catch(err => {
+      console.log(err);
+    });
+});
 
 //POST Controller
-app.post('/add-blog', (req, res) => {
-    //save new blog document to database
-    //console.log(req.body)
-    const newBlog = new Blog(req.body)
-    newBlog.save()
-    .then((result)=>{
-        console.log("Success : Saves this document by inserting a new document into the database")
-        res.redirect('/blog')
-    })
-    .catch((err)=>{
-        console.log(err)
-    })
-})
+app.post('/blogs', (req, res) => {
+  // console.log(req.body);
+  const blog = new Blog(req.body);
 
-//when click to read each blog
-app.get('/blogs/:id',(req,res)=>{
-    const id = req.params.id
-    //console.log(id)
-    Blog.findById(id)
-    .then((result)=>{
-        //console.log(result)
-        res.render('details', { blog: result, title: 'Blog Details' });
+  blog.save()
+    .then(result => {
+      res.redirect('/blogs');
     })
-    .catch((err)=>{
-        console.log(err)
-        console.log("err 44")
+    .catch(err => {
+      console.log(err);
+    });
+});
+
+//Get each specific blog when click to read
+app.get('/blogs/:id', (req, res) => {
+  const id = req.params.id
+  Blog.findById(id)
+    .then(result => {
+      res.render('details', { blog: result, title: 'Blog Details' });
     })
-})
+    .catch(err => {
+      console.log(err);
+    });
+});
+
+//DELETE Controller
+app.delete('/blogs/:id', (req, res) => {
+    const id = req.params.id;
+    
+    Blog.findByIdAndDelete(id)
+      .then(result => {
+        res.json({ redirect: '/blogs' });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
 
 //404 page
 app.use((req, res) => {
